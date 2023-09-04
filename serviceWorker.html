@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="./styles/main.css">
+    </head>
+    <body>
+        <script>
+            window.urlsToCache = [
+                './',
+                './styles/main.css',
+                './styles/main.js'
+            ]
+            if('serviceWorker' in navigator){
+                navigator.serviceWorker.register('./sw-fetch.js')
+                .then(function(registration){
+                    console.log('service worker registered')
+                })
+                .catch(function(err){
+                    console.log('service worker failed', err)
+                })
+            }
+        </script> 
+        <button id="touch">通知serviceWorker</button>
+        <script>
+            window.addEventListener('click', function(){
+                // 方式一
+                // var c = new MessageChannel();
+                // c.port1.onmessage = e => {
+                //     // 收到传给 port1 的消息
+                //     console.log('来自service worker', e)
+                // }
+                // if(navigator.serviceWorker.controller){
+                //     navigator.serviceWorker.controller.postMessage('告诉你个事儿： 我点击了哦', [c.port2])
+                // }
+
+                var bc1 = new BroadcastChannel('c1');
+                bc1.onmessage = e => {
+                    // 页面层收到广播，逻辑处理
+                    console.log('收到sw 消息:    ', e)
+                }
+                // 方式二
+                navigator.serviceWorker.ready.then(swReg => {
+                    swReg.sync.register('同步tag')
+                })
+            })
+            
+            // window.addEventListener('message', function(e){
+            //     console.log('sw 的postmessage: ', e)
+            // })
+        </script>
+    </body>
+    <script src="./styles/main.js"></script>
+</html>
